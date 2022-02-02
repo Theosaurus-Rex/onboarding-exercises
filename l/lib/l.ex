@@ -1,18 +1,27 @@
+
 defmodule L do
-  @moduledoc """
-  Documentation for `L`.
-  """
+  def count(list), do: count(list, 0)
 
-  @doc """
-  Hello world.
+  def count([], acc), do: acc
+  def count([ _head | tail ], acc), do: count(tail, acc + 1)
 
-  ## Examples
+  def reverse(list), do: reverse_helper(list, [])
+  defp reverse_helper([], acc), do: acc
+  defp reverse_helper([ head | tail ], acc), do: reverse_helper(tail, [head | acc])
 
-      iex> L.hello()
-      :world
+  def map([], _func), do: []
+  def map([ head | tail ], func), do: [ func.(head) | map(tail, func) ]
 
-  """
-  def hello do
-    :world
+  def filter([], _fun), do: []
+  def filter([head | tail], func) do
+    if func.(head) do
+      [head | filter(tail, func)]
+    else
+      filter(tail, func)
+    end
   end
+
+  def reduce([], value, _func), do: value
+  def reduce([ head | tail ], value, func), do: reduce(tail, func.(head, value), func)
+
 end
