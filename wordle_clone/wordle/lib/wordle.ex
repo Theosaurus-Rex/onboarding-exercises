@@ -1,4 +1,6 @@
 defmodule Wordle do
+  @spec guess(binary, binary) :: list
+
   def guess(player_guess, secret_word) do
     secret_letters = String.to_charlist(secret_word)
 
@@ -14,6 +16,9 @@ defmodule Wordle do
 
     Enum.reverse(result)
   end
+
+  @spec check_letter(any, any, any) ::
+          {:correct, binary} | {:incorrect, binary} | {:partial, binary}
 
   def check_letter(guess_letter, secret_letter, secret_letters) do
     cond do
