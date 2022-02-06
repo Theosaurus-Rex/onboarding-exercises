@@ -16,10 +16,10 @@ defmodule Tictac do
     
   #Start a new game using a UI
   def start(ui) do
-    {:ok, game} = State.new(ui)
-    player = ui.(game, :get_player)
-    {:ok, game} = State.event(game, {:choose_p1, player})
-    game
+    with {:ok, game} <- State.new(ui),
+          player <- ui.(game, :get_player),
+          {:ok, game} <- State.event(game, {:choose_p1, player}),
+    do: handle(game), else: (error -> error)
   end
 
   #Check which symbol the player is, handle invalid symbol
@@ -35,7 +35,15 @@ defmodule Tictac do
     with {col, row} <- game.ui.(game, :request_move),
         {:ok, board} <- play_at(game.board, col, row, game.turn),
         {:ok, game} <- State.event(%{game | board: board}, {:play, game.turn}),
-        do: game
+        won? <- win_check(board, player),
+        {:ok, game} <- State.event(game, {:check_for_winner, won?}),
+        over? <- game_over?(game),
+        {:ok, game} <- State.event(game, {:game_over?, over?}),
+        do: handle(game), else: (error -> error)
+  end
+
+  def handle(%{status: :game_over} = game) do
+    game.ui.(game, nil)
   end
 
   def place_piece(board, place, player) do
@@ -53,7 +61,7 @@ defmodule Tictac do
     with  {:ok, valid_player} <- check_player(player),
           {:ok, square} <- Square.new(col, row),
           {:ok, new_board} <- place_piece(board, square, valid_player),
-      do: new_board
+      do: {:ok, new_board}, else: (error -> error)
   end
 
 end

@@ -12,10 +12,13 @@ defmodule Tictac.CLI do
         |> String.to_atom
     end
 
+    #Get the current player's next move and return row and column
     def handle(%State{status: :playing} = state, :request_move) do
         display_board(state.board)
         IO.puts("What's #{state.turn}'s next move?")
-        
+        col = IO.gets("Col: ") |> trimmed_int
+        row = IO.gets("Row: ") |> trimmed_int
+        {col, row}
     end
 
     #Helper method to render tokens placed on board 
@@ -33,5 +36,13 @@ defmodule Tictac.CLI do
         ----------
         #{show(b, 1, 3)} | #{show(b, 2, 3)} | #{show(b, 3, 3)}
         """
+    end
+
+    #Helper method to parse string inputs from player
+    def trimmed_int(str) do
+        case Integer.parse(str) do
+            {:ok, n} -> n
+            error -> error
+        end
     end
 end
