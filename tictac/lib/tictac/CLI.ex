@@ -21,6 +21,14 @@ defmodule Tictac.CLI do
         {col, row}
     end
 
+    def handle(%State{status: :game_over} = state, _) do
+        display_board(state.board)
+        case state.winner do
+            :tie -> "Another tie? Seriously?"
+            _ -> "Player #{state.winner} is victorious!"
+        end
+    end
+
     #Helper method to render tokens placed on board 
     def show(board, c, r) do
         [item] = for {%{col: col, row: row}, value} <- board,
@@ -40,9 +48,6 @@ defmodule Tictac.CLI do
 
     #Helper method to parse string inputs from player
     def trimmed_int(str) do
-        case Integer.parse(str) do
-            {:ok, n} -> n
-            error -> error
-        end
+        str |> String.trim |> String.to_integer
     end
 end
