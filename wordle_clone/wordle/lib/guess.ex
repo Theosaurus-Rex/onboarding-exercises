@@ -1,5 +1,18 @@
-defmodule Wordle do
-  @spec guess(binary, binary) :: list
+defmodule Guess do
+  @type guess_result :: :correct | :incorrect | :partial
+  @type letter_guess_result :: {guess_result, binary}
+  @type word_guess_result :: list(letter_guess_result)
+
+  @spec guess(binary, binary) :: word_guess_result
+
+  @type word :: binary
+  @type guess :: binary
+  @type wordle_game :: %{
+          dictionary: list(word()),
+          max_turns: non_neg_integer(),
+          secret_word: word(),
+          guesses: list(word_guess_result()),
+        }
 
   def guess(player_guess, secret_word) do
     secret_letters = String.to_charlist(secret_word)
@@ -17,7 +30,7 @@ defmodule Wordle do
     Enum.reverse(result)
   end
 
-  @spec check_letter(any, any, any) ::
+  @spec check_letter(char, char, charlist) ::
           {:correct, binary} | {:incorrect, binary} | {:partial, binary}
 
   def check_letter(guess_letter, secret_letter, secret_letters) do
